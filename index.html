@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nasjonal prøve i lesing 8.trinn - 2025</title>
+    <style>
+body{
+    font:16px Arial,sans-serif;
+    margin:0;
+    padding:20px;
+    background:#f4f7f9
+}
+.container{
+    max-width:1500px;
+    margin:auto;
+    background:#fff;
+    padding:20px;
+    box-shadow:0 0 10px rgba(0,0,0,.1)
+}
+h1{
+    color:#2c3e50;
+    border-bottom:3px solid #3498db;
+    padding-bottom:10px;
+    text-align:center
+}
+h2{
+    color:#3498db;
+    margin:10px 0 20px;
+    font-size:1.5em
+}
+.test-part{
+    display:none;
+    flex-direction:column;
+    justify-content:space-between;
+    min-height:900px;
+    margin-bottom:40px;
+    border-bottom:1px solid #ddd;
+    padding-bottom:20px
+}
+.content-wrapper{
+    display:flex;
+    gap:20px;
+    flex-grow:1;
+    align-items:flex-start
+}
+.text-section,.question-section{
+    padding:10px;
+    border:1px solid #e0e0e0;
+    border-radius:5px;
+    background:#fcfcfc
+}
+.text-section{
+    flex:2;
+    background:#ecf0f1;
+    padding:0;
+    overflow:hidden;
+    min-height:800px
+}
+.pdf-viewer{
+    width:100%;
+    height:800px;
+    border:none
+/* Legg til dette for å tvinge frem en rullefelt i beholderen */
+    overflow-y: scroll; 
+/* Prøv også -webkit-overflow-scrolling: touch; for bedre rulling på iOS */
+    -webkit-overflow-scrolling: touch;
+}
+.question-section{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+    max-height:600px
+}
+.questions-container{
+    overflow-y:auto;
+    flex-grow:1;
+    padding-bottom:10px
+}
+.question{
+    margin-bottom:20px;
+    padding:10px;
+    border:1px solid #ddd;
+    border-radius:4px;
+    display:none
+}
+
+/* 3. Stil for tekstboksen (<textarea>) - Gjelder KUN for åpne spørsmål */
+.question textarea {
+    width: 100%; /* Sørger for at tekstboksen fyller hele bredden */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Veldig viktig for 100% bredde uten overløp */
+    font-size: 1em;
+    resize: vertical; 
+}
+
+.question.active{
+    display:block
+}
+.question-navigation-buttons{
+    display:flex;
+    justify-content:space-between;
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid #eee;
+    flex-shrink:0
+}
+.next-button-slot{
+    position:relative;
+    width:150px;
+    height:38px
+}
+.question-navigation-buttons button,.question-navigation-buttons input[type="submit"]{
+    padding:8px 15px;
+    background:#5d758f;
+    color:#fff;
+    border:none;
+    border-radius:5px;
+    font-size:1em;
+    cursor:pointer;
+    transition:background-color .3s;
+    width:150px;
+    text-align:center
+}
+.question-navigation-buttons button:hover,.question-navigation-buttons input[type="submit"]:hover{
+    background:#4b6075
+}
+.next-button-slot .nav-right-btn{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%
+}
+.submit-btn,.submit-btn:hover{
+    background:#2ecc71
+}
+.submit-btn:hover{
+    background:#27ae60
+}
+.question p{
+    font-weight:700;
+    margin-top:0;
+    color:#2c3e50
+}
+label{
+    display:block;
+    margin:5px 0;
+    cursor:pointer
+}
+.answer-input{
+    width:90%;
+    padding:8px;
+    margin-top:5px;
+    border:1px solid #ccc;
+    border-radius:3px
+}
+.correct-answer-placeholder{
+    font-weight:400;
+    font-style:italic;
+    color:#999;
+    font-size:.8em;
+    display:block;
+    margin-top:5px
+}
+#resultPage{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    min-height:100%;
+    background:rgba(255,255,255,.95);
+    backdrop-filter:blur(5px);
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    padding-top:50px;
+    box-sizing:border-box;
+    z-index:100
+}
+.result-box{
+    background:#fff;
+    padding:40px;
+    border-radius:10px;
+    box-shadow:0 4px 15px rgba(0,0,0,.2);
+    width:80%;
+    max-width:900px
+}
+#finalScore{
+    font-size:2.5em;
+    color:#27ae60;
+    margin:20px 0;
+    font-weight:700
+}
+#incorrectAnswers{
+    margin-top:30px;
+    border-top:1px solid #ddd;
+    padding-top:20px
+}
+#incorrectAnswers h3{
+    color:#e74c3c;
+    border-bottom:2px solid #e74c3c;
+    padding-bottom:5px
+}
+.incorrect-item{
+    background:#fcebe9;
+    border-left:5px solid #e74c3c;
+    margin-bottom:15px;
+    padding:10px;
+    border-radius:3px
+}
+.incorrect-item p{
+    margin:5px 0;
+    font-weight:400;
+    font-size:.9em
+}
+.incorrect-item .question-text{
+    font-weight:700;
+    color:#2c3e50
+}
+.result-buttons{
+    margin-top:30px;
+    display:flex;
+    justify-content:center;
+    gap:20px
+}
+.result-buttons button{
+    padding:10px 20px;
+    border:none;
+    border-radius:5px;
+    font-size:1.1em;
+    cursor:pointer;
+    transition:background-color .3s
+}
+#restartQuiz{
+    background:#3498db;
+    color:#fff
+}
+#restartQuiz:hover{
+    background:#2980b9
+}
+#closePage{
+    background:#95a5a6;
+    color:#fff
+}
+#closePage:hover{
+    background:#7f8c8d
+}
+.quiz-table td,.quiz-table th{
+    border:1px solid #ddd;
+    padding:10px
+}
+.quiz-table tr:nth-child(even){
+    background:#f9f9f9
+}
+
+.draggable-list {
+    list-style: none; /* Fjern punktmerker */
+    padding: 0;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.draggable-item {
+    padding: 15px;
+    margin: 0;
+    background-color: #94B8E0;
+    border-bottom: 10px solid #eee;
+    cursor: move; /* Indikerer at elementet kan flyttes */
+    transition: transform 0.2s; /* Glatt overgang ved bevegelse */
+}
+
+/* Fjerner bunnmargen på det siste elementet slik at det ligger inntil bunnen av listen */
+.draggable-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Stil for elementet som dras */
+.dragging {
+    opacity: 0.5;
+    background-color: #e0f7fa; /* Lysere farge når det dras */
+}
+
+/* Stil for droppsone */
+.drop-placeholder {
+    height: 50px; /* Samme høyde som et vanlig element */
+    background-color: #b2ebf2;
+    border: 2px dashed #00bcd4;
+}
+
+
+/* Sett stilen på hovedcontaineren for å sentrere og gi en bakgrunn */
+#resultContainer {
+    display: flex;
+    justify-content: center; /* Sentrerer resultatkortet */
+    padding: 20px;
+    background-color: #f4f4f9; /* Lys bakgrunn for hele siden */
+    min-height: 100vh;
+}
+
+/* Stil for selve resultat-ruten */
+.result-card {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    max-width: 800px; /* Sett maksimal bredde */
+    width: 100%;
+    margin: 20px 0;
+}
+
+/* Stil for hovedoverskriften */
+.result-title {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 25px; /* Sørger for at innholdet kommer rett under */
+    border-bottom: 2px solid #3498db; /* En linje under overskriften */
+    padding-bottom: 15px;
+}
+
+/* Stil for oppsummering av poeng */
+.score-summary p {
+    font-size: 1.2em;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 15px;
+    background-color: #ecf0f1;
+    border-radius: 8px;
+}
+
+/* Stil for seksjonen med feilaktige svar */
+.incorrect-answers-section {
+    border-top: 1px solid #bdc3c7; /* Linje for å skille fra poengsum */
+    padding-top: 20px;
+    margin-top: 20px;
+}
+
+.incorrect-title {
+    color: #e74c3c;
+    margin-bottom: 15px;
+}
+
+/* Stil for hvert enkelt feilaktige svar i listen */
+.incorrect-list {
+    list-style-type: none; /* Fjerner standard nummerering */
+    padding: 0;
+}
+
+.incorrect-item {
+    background-color: #fcecec; /* Rødlig bakgrunn for feil */
+    padding: 15px;
+    margin-bottom: 10px;
+    border-left: 5px solid #e74c3c; /* Rød stripe for markering */
+    border-radius: 5px;
+}
+
+.incorrect-item h4 {
+    margin-top: 0;
+    color: #2c3e50;
+    font-size: 1.1em;
+}
+
+.user-answer {
+    color: #e74c3c; /* Rød farge for brukers feil svar */
+}
+
+.correct-answer {
+    color: #27ae60; /* Grønn farge for det riktige svaret */
+    font-weight: bold;
+}
+
+.bakgrunnstekst {
+            font-weight: italic; 
+            margin-top: 0;
+            padding-top: 20px; 
+        }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Nasjonal prøve i lesing 8.trinn - 2025</h1>
+
+
+<div id="quizContent">
+
+    
+    <form id="quizForm" onsubmit="event.preventDefault(); checkQuiz();">
+
+        <div class="test-part" id="part1">
+            <div class="content-wrapper">
+                <div class="text-section">
+                    <h2>DEL 1: Dansemaranton</h2>
+                    <iframe src="Dansemaraton.pdf" class="pdf-viewer" scrolling="yes"></iframe>
+                </div>
+                <div class="question-section">
+                    <h2>Spørsmål til Dansemaraton</h2>
+                    
+                    <div class="questions-container">
+                        <div class="question">
+                            <p>1.1) Hvorfor ble det så populært å se på dansemaraton, ifølge teksten?</p>
+                            <label><input type="radio" name="q1_1" value="A"> Folk ville se på når det ble satt nye danserekorder.</label>
+                            <label><input type="radio" name="q1_1" value="B"> Det var ofte proffe dansere som deltok.</label>
+                            <label><input type="radio" name="q1_1" value="C"> Folk likte å se andre ha det verre enn dem selv.</label>
+                            <label><input type="radio" name="q1_1" value="D"> Det ble servert mat til alle som så på.</label>
+			</div>
+
+<div class="question">
+    <p>1.2) Kryss av for hva som var lovlig, og hva som ikke var lovlig, i en dansemaraton. (Kryss av for «Lovlig» eller «IKKE lovlig»)</strong></p>
+    
+    <table class="quiz-table" style="width:100%; border-collapse: collapse; margin-top: 15px;">
+        <thead>
+            <tr style="background-color: #f2f2f2;">
+                <th style="border: 1px solid #ddd; padding: 10px; text-align: left; width: 60%;">Påstand</th>
+                <th style="border: 1px solid #ddd; padding: 10px; text-align: center; width: 20%;">Lovlig</th>
+                <th style="border: 1px solid #ddd; padding: 10px; text-align: center; width: 20%;">IKKE lovlig</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 10px;">å bytte partner underveis</td>
+                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                    <input type="radio" name="q1_2a" value="Lovlig">
+                </td>
+                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                    <input type="radio" name="q1_2a" value="IKKE lovlig">
+                </td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 10px;">å ta en pause hver time</td>
+                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                    <input type="radio" name="q1_2b" value="Lovlig">
+                </td>
+                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                    <input type="radio" name="q1_2b" value="IKKE lovlig">
+                </td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 10px;">å stå stille</td>
+                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                    <input type="radio" name="q1_2c" value="Lovlig">
+                </td>
+                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                    <input type="radio" name="q1_2c" value="IKKE lovlig">
+                </td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 10px;">å bevege seg på andre måter enn å danse</td>
+                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                    <input type="radio" name="q1_2d" value="Lovlig">
+                </td>
+                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                    <input type="radio" name="q1_2d" value="IKKE lovlig">
+                </td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 10px;">å sove</td>
+                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                    <input type="radio" name="q1_2e" value="Lovlig">
+                </td>
+                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                    <input type="radio" name="q1_2e" value="IKKE lovlig">
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<div class="question">
+    <p>1.3) For mange var det en fordel å delta i dansemaraton selv om de ikke vant. Hva var grunnen til det?</strong></p>
+    
+    <textarea 
+        id="open-text-answer-1_3" 
+        name="q1_3" 
+        rows="5" 
+        placeholder="Skriv inn ditt svar her..."
+        required
+    ></textarea>
+</div>
+
+
+<div class="question">
+    <p>1.4) Fullfør setningen nedenfor slik at den stemmer med det som står i teksten.</p> 
+På bildet ser vi en mann og en dame som 
+        <select name="q1_4">
+            <option value="">-- Velg svar --</option>
+            <option value="A">satte verdensrekord i</option>
+            <option value="B">vant</option>
+            <option value="C">deltok i</option>
+            <option value="D">døde i</option>
+        </select>
+en dansemaraton i Chicago.
+    </p>
+</div>
+
+<div class="question" id="q1_5">
+    <p>1.5) Plasser hendelsene nedenfor i den rekkefølgen de faktisk skjedde, fra først (øverst) til sist (nederst). Klikk på teksten og flytt opp/ned.</p>
+    <ul class="draggable-list">
+        <li class="draggable-item" draggable="true" data-id="verden">Et par setter verdensrekord i dansemaraton</li>
+        <li class="draggable-item" draggable="true" data-id="dør">En mann dør under en dansemaraton</li>
+        <li class="draggable-item" draggable="true" data-id="deltar">Ann Lawanick og Jack Ritof deltar i en dansemaraton</li>
+    </ul>
+</div>
+
+
+                        <div class="question">
+                            <p>1.6) Hva mener sannsynligvis forfatteren om dansemaraton?</p>
+                            <label><input type="radio" name="q1_6" value="A"> at det er dårlig gjort å utnytte folk som har det vanskelig</label>
+                            <label><input type="radio" name="q1_6" value="B"> at man fant på mye gøy før i tiden også</label>
+                            <label><input type="radio" name="q1_6" value="C"> at konkurransen kunne vært gjort enda mer spennende</label>
+                            <label><input type="radio" name="q1_6" value="D"> at det er synd at man sluttet med dansemaraton</label>
+                        </div>
+
+
+                    </div> <div class="question-navigation-buttons">
+                        <button type="button" class="prev-question-btn" onclick="goBack()">Tilbake</button>
+                        <div class="next-button-slot">
+                            <button type="button" class="nav-right-btn next-question-btn" onclick="goNext()">Neste</button>
+                            <button type="button" class="nav-right-btn next-part-btn" onclick="goNext()" style="display: none;">Neste</button>
+                            <input type="submit" class="nav-right-btn submit-btn" value="Fullfør prøven" style="display: none;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+        <div class="test-part" id="part2">
+            <div class="content-wrapper">
+                <div class="text-section">
+                    <h2>DEL 2: Pinocchiokulene</h2>
+                    <iframe src="Pinocchiokulene.pdf" class="pdf-viewer scrolling="yes""></iframe>
+                </div>
+                <div class="question-section">
+                    <h2>Spørsmål til “Pinocchiokulene”</h2>
+                    
+                    <div class="questions-container">
+                        <div class="question">
+                            <p>2.1) Når bestemmer jenta seg for å stjele godteri?</p>
+                            <label><input type="radio" name="q2_1" value="A"> før hun går inn i butikken</label>
+                            <label><input type="radio" name="q2_1" value="B"> når hun ser alt godteriet i butikken</label>
+                            <label><input type="radio" name="q2_1" value="C"> når hun tenker på faren sin</label>
+                            <label><input type="radio" name="q2_1" value="D"> når hun snakker med damen i butikken</label>
+                        </div>
+
+                        <div class="question">
+    <p>2.2) Hva er den viktigste grunnen til at jenta stjeler godteri fra butikken?</strong></p>
+    <textarea 
+        id="open-text-answer-2_2" 
+        name="q2_2" 
+        rows="5" 
+        placeholder="Skriv inn ditt svar her..."
+        required
+    ></textarea>
+</div>
+
+                        <div class="question">
+                            <p>2.3) Hvorfor tar jenta pinocchiokulene og ikke noe annet godteri?</p>
+                            <label><input type="radio" name="q2_3" value="A"> fordi det er det beste hun vet</label>
+                            <label><input type="radio" name="q2_3" value="B"> fordi det er det beste faren hennes vet</label>
+                            <label><input type="radio" name="q2_3" value="C"> fordi de er små og billige</label>
+                            <label><input type="radio" name="q2_3" value="D"> fordi de andre barna sier hun skal gjøre det</label>
+                        </div>
+<div class="question">
+    <p>2.4) Fullfør setningen nedenfor.</p> Jenta stjeler
+        <select name="q2_4">
+            <option value="">-- Velg svar --</option>
+            <option value="A">én pose</option>
+            <option value="B">to poser</option>
+            <option value="C">tre poser</option>
+        </select>
+        pinocchiokuler i butikken.
+    </p>
+</div>
+                        <div class="question">
+                            <p>2.5) Hvorfor tenkte jenta at hun skulle levere godteriet tilbake til butikken?</p>
+                            <label><input type="radio" name="q2_5" value="A"> Faren sa at hun måtte gjøre det.</label>
+                            <label><input type="radio" name="q2_5" value="B"> Hun hadde dårlig samvittighet.</label>
+                            <label><input type="radio" name="q2_5" value="C"> Hun likte ikke pinocchiokulene.</label>
+                            <label><input type="radio" name="q2_5" value="D"> Hun ville imponere de andre barna.</label>
+                        </div>
+
+
+                    </div> <div class="question-navigation-buttons">
+                        <button type="button" class="prev-question-btn" onclick="goBack()">Tilbake</button>
+                        <div class="next-button-slot">
+                            <button type="button" class="nav-right-btn next-question-btn" onclick="goNext()">Neste</button>
+                            <button type="button" class="nav-right-btn next-part-btn" onclick="goNext()" style="display: none;">Neste</button>
+                            <input type="submit" class="nav-right-btn submit-btn" value="Fullfør prøven" style="display: none;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="test-part" id="part3">
+            <div class="content-wrapper">
+                <div class="text-section">
+                    <h2>DEL 3: Ørnerovet</h2>
+                    <iframe src="Ørnerovet.pdf" class="pdf-viewer" scrolling="yes"></iframe>
+                </div>
+                <div class="question-section">
+                    <h2>Spørsmål til “Ørnerovet”</h2>
+                    
+                    <div class="questions-container">
+                        <div class="question">
+                            <p>3.1) Hva i tekst 1 blir brukt som et bevis for at Svanhild ble tatt av en ørn?</p>
+                            <label><input type="radio" name="q3_1" value="A"> Klærne til Svanhild hadde merker etter en ørneklo.</label>
+                            <label><input type="radio" name="q3_1" value="B"> Svanhild fortalte selv at en ørn hadde tatt henne.</label>
+                            <label><input type="radio" name="q3_1" value="C"> Det var flere som så at en ørn fløy av gårde med Svanhild.</label>
+                            <label><input type="radio" name="q3_1" value="D"> Svanhild ble funnet med sår og rifter fra ørneklør.</label>
+                        </div>
+
+                        <div class="question">
+                            <p>3.2) Les avsnittet som begynner med «Steinar Hunnestad har skrevet …» i tekst 1. Hvilken overskrift kunne ha passet til dette avsnittet?</p>
+                            <label><input type="radio" name="q3_2" value="A"> Kritiske til ørnerovet</label>
+                            <label><input type="radio" name="q3_2" value="B"> Stemplet som løgnere</label>
+                            <label><input type="radio" name="q3_2" value="C"> Stor interesse for ørnerovet</label>
+                            <label><input type="radio" name="q3_2" value="D"> Dramatikk i fjellet</label>
+                        </div>
+
+                        <div class="question">
+                            <p>3.3) Hvilken opplysning i tekst 2 viser at historien om ørnerovet er viktig for de som bor på Leka?</strong></p>
+                            <textarea 
+                            id="open-text-answer-3_3" 
+                            name="q3_3" 
+                            rows="5" 
+                            placeholder="Skriv inn ditt svar her..."
+                            required
+                            ></textarea>
+                        </div>
+
+
+                        <div class="question">
+                            <p>3.4) Hva er grunnen til at Tor Bollingmo ikke tror på historien om Svanhild og ørnen, ifølge tekst 2?</p>
+                            <label><input type="radio" name="q3_4" value="A"> En ørn ville aldri klart å fly av gårde med et så stort barn.</label>
+                            <label><input type="radio" name="q3_4" value="B"> Svanhild har aldri sagt at det var en ørn som tok henne.</label>
+                            <label><input type="radio" name="q3_4" value="C"> Svanhild var uskadet da hun ble funnet.</label>
+                            <label><input type="radio" name="q3_4" value="D"> Det var ingen hull i kjolen til Svanhild.</label>
+                        </div>
+                        <div class="question">
+                            <p>3.5) Fullfør setningen nedenfor. 
+                                    For å finne ut om historien om ørnerovet på Leka var sann, undersøkte Jan Ove Gjershaug …</p>
+                            <label><input type="radio" name="q3_5" value="A"> om en havørn vil ta et barn som går alene i fjellet.</label>
+                            <label><input type="radio" name="q3_5" value="B"> om et barn på tre år kan komme seg til funnstedet.</label>
+                            <label><input type="radio" name="q3_5" value="C"> om en havørn kan bære lam og reinsdyrkalver.</label>
+                            <label><input type="radio" name="q3_5" value="D"> om klærne til Svanhild hadde hull og rifter.</label>
+                        </div>
+
+                        <div class="question">
+                            <p>3.6) Hvem kan ha interesse av at folk tror på historien om ørnerovet?</p>
+                            <label><input type="radio" name="q3_6" value="A"> Fugleforskere</label>
+                            <label><input type="radio" name="q3_6" value="B"> Fjellklatrere</label>
+                            <label><input type="radio" name="q3_6" value="C"> Småbarnsforeldre</label>
+                            <label><input type="radio" name="q3_6" value="D"> Turistnæringen på Leka</label>
+                        </div>
+
+
+                    </div> <div class="question-navigation-buttons">
+                        <button type="button" class="prev-question-btn" onclick="goBack()">Tilbake</button>
+                        <div class="next-button-slot">
+                            <button type="button" class="nav-right-btn next-question-btn" onclick="goNext()">Neste</button>
+                            <button type="button" class="nav-right-btn next-part-btn" onclick="goNext()" style="display: none;">Neste</button>
+                            <input type="submit" class="nav-right-btn submit-btn" value="Fullfør prøven" style="display: none;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="test-part" id="part4">
+            <div class="content-wrapper">
+                <div class="text-section">
+                    <h2>DEL 4: Mona Lisa</h2>
+                    <iframe src="Mona Lisa.pdf" class="pdf-viewer" scrolling="yes"></iframe>
+                </div>
+                <div class="question-section">
+                    <h2>Spørsmål til “Mona Lisa”</h2>
+
+                    <div class="questions-container">
+                        <div class="question">
+                            <p>4.1) Maleriet som skal selges, kalles «Mona Lisa Hekking». Hvor kommer dette navnet fra?</p>
+                            <label><input type="radio" name="q4_1" value="A"> fra kunstneren som malte det</label>
+                            <label><input type="radio" name="q4_1" value="B"> fra kunsthandleren som kjøpte det</label>
+                            <label><input type="radio" name="q4_1" value="C"> fra tyven som stjal det fra museet</label>
+                            <label><input type="radio" name="q4_1" value="D"> fra auksjonshuset som skal selge det</label>
+                        </div>
+
+<div class="question">
+    <p>4.2) Hva var bakgrunnen for at Raymond Hekking kunne påstå at han eide det originale «Mona Lisa»-maleriet?</strong></p>
+    <textarea 
+        id="open-text-answer-4_2" 
+        name="q4_2" 
+        rows="5" 
+        placeholder="Skriv inn ditt svar her..."
+        required
+    ></textarea>
+</div>
+
+                        <div class="question">
+                            <p>4.3) Hva er riktig om maleriet som skal selges på auksjon, ifølge teksten?</p>
+                            <label><input type="radio" name="q4_3" value="A"> Maleriet har tidligere blitt stjålet.</label>
+                            <label><input type="radio" name="q4_3" value="B"> Maleriet er en kopi av et berømt maleri.</label>
+                            <label><input type="radio" name="q4_3" value="C"> Maleriet har tidligere blitt solgt for mye penger.</label>
+                            <label><input type="radio" name="q4_3" value="D"> Maleriet er malt av en svært kjent kunstner.</label>
+                        </div>
+
+<div class="question" id="q4_4">
+    <p>4.4) Plasser hendelsene nedenfor i den rekkefølgen de faktisk skjedde, fra først (øverst) til sist (nederst). Klikk på teksten og flytt opp/ned.</p>
+    <ul class="draggable-list">
+        <li class="draggable-item" draggable="true" data-id="3">Raymond Hekking påstår at maleriet “Mona Lisa” i Louvre er en kopi.</li>
+        <li class="draggable-item" draggable="true" data-id="2">Maleriet “Mona Lisa” blir levert tilbake til Louvre.</li>
+        <li class="draggable-item" draggable="true" data-id="4">Et auksjonshus skal selge en kopi av  maleriet “Mona Lisa”.</li>
+        <li class="draggable-item" draggable="true" data-id="1">Vincenzo Perugia stjeler  maleriet “Mona Lisa”.</li>
+    </ul>
+</div>
+
+      <div class="question">
+      <p>4.5) Hva får vi svar på, og hva får vi ikke svar på i denne teksten?
+Kryss av for «Får svar» og «Får IKKE svar» i tabellen nedenfor.
+</strong></p> 
+      <table class="quiz-table" style="width:100%; border-collapse: collapse; margin-top: 15px;">
+        <thead>
+            <tr style="background-color: #f2f2f2;">
+                <th style="border: 1px solid #ddd; padding: 10px; text-align: left; width: 60%;">Påstand</th>
+                <th style="border: 1px solid #ddd; padding: 10px; text-align: center; width: 20%;">Får svar</th>
+                <th style="border: 1px solid #ddd; padding: 10px; text-align: center; width: 20%;">Får IKKE svar</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 10px;">hvem som stjal «Mona Lisa» fra Louvre i 1911</td>
+                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                    <input type="radio" name="q4_5a" value="Får svar">
+                </td>
+                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                    <input type="radio" name="q4_5a" value="Får IKKE svar">
+                </td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 10px;">hvilket år Raymond Hekking kjøpte maleriet</td>
+                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                    <input type="radio" name="q4_5b" value="Får svar">
+                </td>
+                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                    <input type="radio" name="q4_5b" value="Får IKKE svar">
+                </td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 10px;">hvem som har malt «Mona Lisa Hekking»</td>
+                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                    <input type="radio" name="q4_5c" value="Får svar">
+                </td>
+                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                    <input type="radio" name="q4_5c" value="Får IKKE svar">
+                </td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 10px;">hvem som skal selge «Mona Lisa Hekking»</td>
+                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                    <input type="radio" name="q4_5d" value="Får svar">
+                </td>
+                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                    <input type="radio" name="q4_5d" value="Får IKKE svar">
+                </td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 10px;">hvor mye «Mona Lisa Hekking» ble solgt for</td>
+                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                    <input type="radio" name="q4_5e" value="Får svar">
+                </td>
+                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                    <input type="radio" name="q4_5e" value="Får IKKE svar">
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+
+                    </div> <div class="question-navigation-buttons">
+                        <button type="button" class="prev-question-btn" onclick="goBack()">Tilbake</button>
+                        <div class="next-button-slot">
+                            <button type="button" class="nav-right-btn next-question-btn" onclick="goNext()">Neste</button>
+                            <button type="button" class="nav-right-btn next-part-btn" onclick="goNext()" style="display: none;">Neste</button>
+                            <input type="submit" class="nav-right-btn submit-btn" value="Fullfør prøven" style="display: none;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-part" id="part5">
+            <div class="content-wrapper">
+                <div class="text-section">
+                    <h2>DEL 5: Du har jo sykkelen din</h2>
+                    <iframe src="Du har jo sykkelen din.pdf" class="pdf-viewer" scrolling="yes"></iframe>
+                </div>
+                <div class="question-section">
+                    <h2>Spørsmål til “Du har jo sykkelen din”</h2>
+<div class="questions-container">
+<div class="question">
+    <p>5.1) Hva er grunnen til at jenta er hjemme denne dagen?</strong></p>
+    <textarea 
+        id="open-text-answer-5_1" 
+        name="q5_1" 
+        rows="5" 
+        placeholder="Skriv inn ditt svar her..."
+        required
+    ></textarea>
+</div>
+                
+
+                        <div class="question">
+                            <p>5.2) Hva er det jenta i teksten lyver om?</p>
+                            <label><input type="radio" name="q5_2" value="A"> at hun har mest lyst til å se tigrene</label>
+                            <label><input type="radio" name="q5_2" value="B"> at hun har fått en liten hund</label>
+                            <label><input type="radio" name="q5_2" value="C"> at hun har stått på skøyter i en konkurranse</label>
+                            <label><input type="radio" name="q5_2" value="D"> at hun nettopp har vært i dyreparken</label>
+                        </div>
+
+<div class="question" id="q5_3">
+    <p>5.3) Plasser hendelsene nedenfor i den rekkefølgen de faktisk skjedde, fra først (øverst) til sist (nederst). Klikk på teksten og flytt opp/ned.</p>
+    <ul class="draggable-list">
+        <li class="draggable-item" draggable="true" data-id="2">Stina og Kerstin reiser med de andre.</li>
+        <li class="draggable-item" draggable="true" data-id="1">Jenta har bursdag.</li>
+        <li class="draggable-item" draggable="true" data-id="3">Jenta sykler i bakgården.</li>
+    </ul>
+</div>
+
+                        <div class="question">
+                            <p>5.4) Hva synes egentlig jenta om å være hjemme denne dagen?</p>
+                            <label><input type="radio" name="q5_4" value="A"> Hun er glad for at hun slipper å være på tur i regnvær.</label>
+                            <label><input type="radio" name="q5_4" value="B"> Hun syns det er koselig å være sammen med moren.</label>
+                            <label><input type="radio" name="q5_4" value="C"> Hun vil heller sykle enn å være med klassen på tur.</label>
+                            <label><input type="radio" name="q5_4" value="D"> Hun ville helst ha vært med klassen på tur.</label>
+                        </div>
+                    </div> <div class="question-navigation-buttons">
+                        <button type="button" class="prev-question-btn" onclick="goBack()">Tilbake</button>
+                        <div class="next-button-slot">
+                            <button type="button" class="nav-right-btn next-question-btn" onclick="goNext()">Neste</button>
+                            <button type="button" class="nav-right-btn next-part-btn" onclick="goNext()" style="display: none;">Neste</button>
+                            <input type="submit" class="nav-right-btn submit-btn" value="Fullfør prøven" style="display: none;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-part" id="part6">
+            <div class="content-wrapper">
+                <div class="text-section">
+                    <h2>DEL 6: Bananfluer</h2>
+                    <iframe src="Bananfluer.pdf" class="pdf-viewer" scrolling="yes"></iframe>
+                </div>
+                <div class="question-section">
+                    <h2>Spørsmål til “Bananfluer”</h2>
+
+<div class="questions-container">                    
+                        <div class="question">
+                            <p>6.1) Hvilket spørsmål ønsket forskerne bak bananflue-studien å få svar på?</p>
+                            <label><input type="radio" name="q6_1" value="A"> Hvor lenge orker en bananflue å kjøre karusell?</label>
+                            <label><input type="radio" name="q6_1" value="B"> Liker bananfluer å kjøre karusell?</label>
+                            <label><input type="radio" name="q6_1" value="C"> Hvilke bananfluer ønsker å kjøre karusell?</label>
+                            <label><input type="radio" name="q6_1" value="D"> Kjører bananfluer karusell hvis de får belønning?</label>
+                        </div>
+
+                        <div class="question">
+                            <p>6.2) Hva gjorde forskerne for å finne svar på spørsmålet?</p>
+                            <label><input type="radio" name="q6_2" value="A"> De trente opp bananfluene til å kjøre karusell.</label>
+                            <label><input type="radio" name="q6_2" value="B"> De gjennomførte samme forsøk med ulike insekter.</label>
+                            <label><input type="radio" name="q6_2" value="C"> De gjennomførte tre ulike forsøk med bananfluer.</label>
+                            <label><input type="radio" name="q6_2" value="D"> De leste tidligere forskningsartikler om bananfluer.</label>
+                        </div>
+
+                        <div class="question">
+                            <p>6.3) For å finne ut om bananfluer liker å kjøre karusell, ga forskerne bananfluene fri tilgang på mat og vann og mye plass å sitte på utenom karusellen. Hvorfor var dette viktig for forsøket?</strong></p>
+                            <textarea 
+                             id="open-text-answer-6_3" 
+                             name="q6_3" 
+                             rows="5" 
+                             placeholder="Skriv inn ditt svar her..."
+                             required
+                            ></textarea>
+                        </div>
+
+                        <div class="question">
+                            <p>6.4) Hva fant forskerne bak bananflue-studien ut?</p>
+                            <label><input type="radio" name="q6_4" value="A"> at mange bananfluer valgte å sitte på en snurrende plate</label>
+                            <label><input type="radio" name="q6_4" value="B"> at bananfluene satte seg på en snurrende plate hvis det lå mat der</label>
+                            <label><input type="radio" name="q6_4" value="C"> at bananfluene helst ville sitte på en plate som stod stille</label>
+                            <label><input type="radio" name="q6_4" value="D"> at mange bananfluer ble stresset av å sitte på en snurrende plate</label>
+                        </div>
+
+                        <div class="question">
+                            <p>6.5) Hvordan har forfatteren av denne teksten gått fram for å hente informasjon om bananflue-studien?</p>
+                            <label><input type="radio" name="q6_5" value="A"> Hun har intervjuet forskerne bak studien.</label>
+                            <label><input type="radio" name="q6_5" value="B"> Hun var til stede da eksperimentet ble gjennomført.</label>
+                            <label><input type="radio" name="q6_5" value="C"> Hun har lest om studien på en nettside om forskning.</label>
+                            <label><input type="radio" name="q6_5" value="D"> Hun har sett en dokumentar om dyr som leker.</label>
+                        </div>
+
+<div class="question">
+    <p>6.6) Velg det ordet i listen som viser at forskerne ikke er helt sikre på om bananfluer synes det er gøy å kjøre karusell (ordene i teksten står med store bokstaver).</p> 
+        <select name="q6_6">
+            <option value="">-- Velg svar --</option>
+            <option value="A">KAN</option>
+            <option value="B">VISER</option>
+            <option value="C">SYNES</option>
+            <option value="D">TYDER</option>
+            <option value="E">VALGTE</option>
+        </select>
+</p> <p class="bakgrunnstekst">
+        Vi mennesker synes det KAN være gøy å sitte stille mens vi likevel er i bevegelse, for eksempel på en huske eller karusell. Nå VISER det seg at bananfluer også SYNES dette er moro. Det TYDER i alle fall ny forskning på. I et rom med mange bananfluer satte forskere inn en plate som snurret rundt, og mange av fluene VALGTE å ta seg flere turer med karusellen.
+    </p>
+</div>
+
+                        <div class="question">
+                            <p>6.7) Hva er grunnen til at en studie med humler er nevnt i denne teksten?</p>
+                            <label><input type="radio" name="q6_7" value="A"> Resultatet fra humle-studien motbeviser resultatet fra bananflue-studien.</label>
+                            <label><input type="radio" name="q6_7" value="B"> Humle-studien er inspirert av bananflue-studien.</label>
+                            <label><input type="radio" name="q6_7" value="C"> Forskere er kritiske til både humle-studien og bananflue-studien.</label>
+                            <label><input type="radio" name="q6_7" value="D"> Resultatet fra humle-studien ligner på resultatet fra bananflue-studien.</label>
+                        </div>
+
+                    </div> <div class="question-navigation-buttons">
+                        <button type="button" class="prev-question-btn" onclick="goBack()">Tilbake</button>
+                        <div class="next-button-slot">
+                            <button type="button" class="nav-right-btn next-question-btn" onclick="goNext()">Neste</button>
+                            <button type="button" class="nav-right-btn next-part-btn" onclick="goNext()" style="display: none;">Neste</button>
+                            <input type="submit" class="nav-right-btn submit-btn" value="Fullfør prøven" style="display: none;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+     
+        <div class="test-part" id="part7">
+            <div class="content-wrapper">
+                <div class="text-section">
+                    <h2>DEL 7: Zarafa</h2>
+                    <iframe src="Zarafa.pdf" class="pdf-viewer" scrolling="yes"></iframe>
+                </div>
+                <div class="question-section">
+                    <h2>Spørsmål til “Zarafa”</h2>
+
+<div class="questions-container">                    
+                        <div class="question">
+                            <p>7.1) Hvorfor ble Zarafa berømt da hun kom til Frankrike?</p>
+                            <label><input type="radio" name="q7_1" value="A"> Folk var ikke vant til å se sjiraffer på den tiden.</label>
+                            <label><input type="radio" name="q7_1" value="B"> Hun var den første sjiraffen som kom til Europa.</label>
+                            <label><input type="radio" name="q7_1" value="C"> Hun gikk lenger enn noen annen sjiraff hadde gått før.</label>
+                            <label><input type="radio" name="q7_1" value="D"> Hun ble drept av en flokk løver som underholdning.</label>
+                        </div>
+
+                        <div class="question">
+                            <p>7.2) Hvorfor måtte Zarafa gå hele veien fra Marseille til Paris?</p>
+                            <label><input type="radio" name="q7_2" value="A"> Den franske kongen ville at flest mulig skulle få se Zarafa.</label>
+                            <label><input type="radio" name="q7_2" value="B"> Det var raskere å la Zarafa gå selv enn å frakte henne.</label>
+                            <label><input type="radio" name="q7_2" value="C"> Den franske kongen ville ikke betale for å hente Zarafa til Paris.</label>
+                            <label><input type="radio" name="q7_2" value="D"> Det var vanskelig å finne en god måte å frakte Zarafa på.</label>
+                        </div>
+
+                        <div class="question">
+                            <p>7.3) Hva vil forfatteren få fram når han skriver at «1/8 av innbyggerne i Paris» kom for å se Zarafa?</p>
+                            <label><input type="radio" name="q7_3" value="A"> at det egentlig ikke var så mange som ville se Zarafa</label>
+                            <label><input type="radio" name="q7_3" value="B"> at det bodde veldig mange mennesker i Paris</label>
+                            <label><input type="radio" name="q7_3" value="C"> at det var mange mennesker som ville se Zarafa</label>
+                            <label><input type="radio" name="q7_3" value="D"> at man ikke vet nøyaktig hvor mange som kom for å se Zarafa</label>
+                        </div>
+
+                        <div class="question">
+                            <p>7.4) Hva menes med at Zarafa satte et enormt avtrykk på datidens Frankrike?</p>
+                            <label><input type="radio" name="q7_4" value="A"> Det kostet mye penger å frakte Zarafa til Paris.</label>
+                            <label><input type="radio" name="q7_4" value="B"> Zarafa underholdt på sirkus over hele Frankrike.</label>
+                            <label><input type="radio" name="q7_4" value="C"> Zarafa inspirerte franske kunstnere og moteskapere.</label>
+                            <label><input type="radio" name="q7_4" value="D"> Det ble populært å gi sjiraffer i gave til rike folk.</label>
+                        </div>
+ 
+                        <div class="question" id="q7_5">
+                            <p>7.5) Plasser hendelsene nedenfor i den rekkefølgen de faktisk skjedde, fra først (øverst) til sist (nederst). Klikk på teksten og flytt opp/ned.</p>
+                            <ul class="draggable-list">
+                            <li class="draggable-item" draggable="true" data-id="3">Zarafa kommer fram til Marseille i Frankrike.</li>
+                            <li class="draggable-item" draggable="true" data-id="1">Julius Cæsar får hentet en sjiraff til Roma.</li>
+                            <li class="draggable-item" draggable="true" data-id="2">Mohammed Ali av Egypt gir en sjiraff i gave til kong Karl 10.</li>
+                            <li class="draggable-item" draggable="true" data-id="4">Zarafa blir plassert i den zoologiske hagen i Paris.</li>
+                            </ul>
+                       </div>
+<div class="question">
+    <p>7.6) Fullfør setningen nedenfor.</p> Hvis du vil se Zarafa i dag, må du dra til byen
+        <select name="q7_6">
+            <option value="">-- Velg svar --</option>
+            <option value="A">Marseille</option>
+            <option value="B">Lyon</option>
+            <option value="C">Paris</option>
+            <option value="D">La Rochelle</option>
+        </select>
+        pinocchiokuler i butikken.
+    </p>
+</div>   
+
+                    </div> <div class="question-navigation-buttons">
+                        <button type="button" class="prev-question-btn" onclick="goBack()">Tilbake</button>
+                        <div class="next-button-slot">
+                            <button type="button" class="nav-right-btn next-question-btn" onclick="goNext()">Neste</button>
+                            <button type="button" class="nav-right-btn next-part-btn" onclick="goNext()" style="display: none;">Neste</button>
+                            <input type="submit" class="nav-right-btn submit-btn" value="Fullfør prøven" style="display: none;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+<div id="resultPage">
+        <div class="result-box">
+            <h1 style="border-bottom-color: #27ae60;">Gratulerer! Du har fullført prøven! 🎉</h1>
+            <h2>Ditt resultat:</h2>
+            <div id="finalScore"></div>
+            
+            <div id="incorrectAnswers">
+                <h3>Feilaktige svar:</h3>
+                                <p id="allCorrectMessage" style="color:#27ae60; font-weight: bold; display: none;">Alle svar er riktige!</p>
+            </div>
+            
+            <div class="result-buttons">
+                <button id="restartQuiz" onclick="restartQuiz()">🔄 Start prøven på nytt</button>
+                <button id="closePage" onclick="closeWindow()">❌ Lukk siden</button>
+            </div>
+<script>
+    // --- STATE VARIABLER ---
+    let currentPart = 1;
+    let currentQuestionIndex = 0;
+    const totalParts = 7;
+    const partIds = ['part1', 'part2', 'part3', 'part4', 'part5', 'part6', 'part7'];
+    const quizContent = document.getElementById('quizContent');
+    
+    // --- FASIT & DATA STRUKTURER ---
+
+    // Kartlegger antall spørsmål per del
+    const questionsPerPart = {
+        1: 6, 2: 5, 3: 6, 4: 5, 5: 4, 6: 7, 7: 6,
+    };
+
+    // Flervalg og Match-spørsmål (ID: Riktig svar)
+    const correctAnswers = {
+        // DEL 1
+        'q1_1': 'C', 'q1_2a': 'IKKE lovlig', 'q1_2b': 'Lovlig', 'q1_2c': 'IKKE lovlig', 'q1_2d': 'Lovlig', 'q1_2e': 'Lovlig', 'q1_4': 'C', 'q1_6': 'A',
+        // DEL 2
+        'q2_1': 'A', 'q2_3': 'C', 'q2_4': 'B', 'q2_5': 'B',
+        // DEL 3
+        'q3_1': 'A', 'q3_2': 'C', 'q3_4': 'A', 'q3_5': 'B', 'q3_6': 'D',
+        // DEL 4
+        'q4_1': 'B', 'q4_3': 'B', 'q4_5a': 'Får svar', 'q4_5b': 'Får IKKE svar', 'q4_5c': 'Får IKKE svar', 'q4_5d': 'Får svar', 'q4_5e': 'Får IKKE svar',
+        // DEL 5
+        'q5_2': 'D', 'q5_4': 'D',
+        // DEL 6
+        'q6_1': 'B', 'q6_2': 'C', 'q6_4': 'A', 'q6_5': 'C', 'q6_6': 'D', 'q6_7': 'D',
+        // DEL 7
+        'q7_1': 'A', 'q7_2': 'D', 'q7_3': 'C', 'q7_4': 'C', 'q7_6': 'D',
+    };
+    
+    // NYTT: Kartlegger poeng for hvert spørsmåls-ID (Flervalg/Match/Sortering)
+    const questionPoints = {
+        // Del 1 (Flervalg/Match = 1p, Sortering = 2p)
+        'q1_1': 1, 'q1_2a': 1, 'q1_2b': 1, 'q1_2c': 1, 'q1_2d': 1, 'q1_2e': 1, 'q1_4': 1, 'q1_6': 1,
+        'q1_5': 1, 
+        // Del 2
+        'q2_1': 1, 'q2_3': 1, 'q2_4': 1, 'q2_5': 1,
+        // Del 3
+        'q3_1': 1, 'q3_2': 1, 'q3_4': 1, 'q3_5': 1, 'q3_6': 1,
+        // Del 4 (Sortering = 3p)
+        'q4_1': 1, 'q4_3': 1, 'q4_5a': 1, 'q4_5b': 1, 'q4_5c': 1, 'q4_5d': 1, 'q4_5e': 1,
+        'q4_4': 1,
+        // Del 5 (Sortering = 2p)
+        'q5_2': 1, 'q5_4': 1,
+        'q5_3': 1, 
+        // Del 6
+        'q6_1': 1, 'q6_2': 1, 'q6_4': 1, 'q6_5': 1, 'q6_7': 1,
+        // Del 7 (Sortering = 3p)
+        'q7_1': 1, 'q7_2': 1, 'q7_3': 1, 'q7_4': 1, 'q7_6': 1,
+        'q7_5': 1, 
+    };
+    
+    // Åpne spørsmål med nøkkelord for automatisk retting
+    const keywordAnswers = {
+        'q1_3': { keywords: ["mat", "husly", "husli"], points: 1 },
+        'q2_2': { keywords: ["vise", "tør", "tøff", "tørr"], points: 1 },
+        'q3_3': { keywords: ["våpen", "kommunevåpen", "komunevåpnet", "kommunevåpnet", "kommunevåpenet", "kommunevopnet"], points: 1 },
+        'q4_2': { keywords: ["stjålet", "feil maleri"], points: 1 },
+        'q5_1': { keywords: ["penger", "råd", "betale", "betaling", "koster"], points: 1 },
+        'q6_3': { keywords: ["eget valg", "fritt valg", "valg", "fritt", "velge", "uavhengig"], points: 1 },
+    };
+    
+    // ID-er for alle de åpne tekstspørsmålene
+    const openQuestionIds = [
+        'q1_3', 'q2_2', 'q3_3', 'q4_2', 'q5_1', 'q6_3'
+    ];
+
+    // Sorteringsspørsmål (ID: Korrekt rekkefølge av data-id verdier)
+    const correctOrder_q1_5 = ["dør", "deltar", "verden"];
+    const correctOrder_q4_4 = ["1", "2", "3", "4"];
+    const correctOrder_q5_3 = ["1", "2", "3"];
+    const correctOrder_q7_5 = ["1", "2", "3", "4"];
+    
+    // Definer alle sorteringsspørsmålene og deres fasit
+    const orderQuestionData = [
+        { id: 'q1_5', correct: correctOrder_q1_5 },
+        { id: 'q4_4', correct: correctOrder_q4_4 },
+        { id: 'q5_3', correct: correctOrder_q5_3 },
+        { id: 'q7_5', correct: correctOrder_q7_5 },
+    ];
+
+
+    // --- HENTE POENG & RESULTAT FUNKSJONER ---
+
+    /**
+     * Henter spørsmålsteksten basert på ID/navn.
+     */
+    function getQuestionText(qName, elementId) {
+        // 1. Forsøk å finne spørsmålselementet via name eller id
+        let questionElement = document.querySelector(`[name="${qName}"]`) || document.getElementById(elementId || qName);
+        
+        if (questionElement) {
+            // 2. Finn den nærmeste overordnede div med klassen 'question'
+            let questionDiv = questionElement.closest('.question');
+            
+            // 3. Hvis funnet, returner innholdet i det første <p>-elementet
+            if (questionDiv) {
+                const pElement = questionDiv.querySelector('p:first-child');
+                return pElement ? pElement.innerText : `Spørsmål ${qName}`;
+            }
+        }
+        // 4. Fallback
+        return `Spørsmål ${qName}`;
+    }
+
+    /**
+     * Sjekker om nøkkelord finnes i svaret for åpent spørsmål.
+     * @returns {number} Poengsum.
+     */
+    function getPointsForOpenQuestion(questionId, userAnswer) {
+        if (!keywordAnswers[questionId]) {
+            return 0;
+        }
+        
+        const questionData = keywordAnswers[questionId];
+        const sanitizedAnswer = userAnswer.toLowerCase().trim();
+        
+        for (const keyword of questionData.keywords) {
+            if (sanitizedAnswer.includes(keyword)) {
+                return questionData.points;
+            }
+        }
+        
+        return 0;
+    }
+
+    /**
+     * Sjekker alle flervalgs- og match-spørsmål og returnerer score og feil.
+     * @returns {{score: number, max: number, incorrect: Array}} Resultatobjekt.
+     */
+/**
+ * Sjekker alle flervalgs- og match-spørsmål og returnerer score og feil.
+ * @returns {{score: number, max: number, incorrect: Array}} Resultatobjekt.
+ */
+function getResultForMultipleChoice() {
+    let mcScore = 0;
+    let max = 0;
+    const incorrect = [];
+    
+    for (const qId in correctAnswers) {
+        // ENDRET: Henter maks poeng fra questionPoints
+        const maxPoints = questionPoints[qId] || 1; 
+        max += maxPoints; 
+        
+        const expectedAnswer = correctAnswers[qId];
+        
+        // --- ENDRING HER: Utvid søket til å inkludere <select> elementer ---
+        
+        // 1. Prøv å finne en valgt radio-knapp:
+        let userAnswerElement = document.querySelector(`input[name="${qId}"]:checked`);
+        
+        // 2. Hvis ingen radio-knapp er funnet, prøv å finne et <select> element:
+        if (!userAnswerElement) {
+            userAnswerElement = document.querySelector(`select[name="${qId}"]`);
+        }
+        
+        // 3. Hent brukerens svar basert på elementtype
+        let userAnswer = 'Ikke besvart';
+        
+        if (userAnswerElement) {
+            // Hvis det er et <select>-element:
+            if (userAnswerElement.tagName === 'SELECT') {
+                userAnswer = userAnswerElement.value;
+            } 
+            // Hvis det er en sjekket radio/checkbox:
+            else if (userAnswerElement.checked) {
+                userAnswer = userAnswerElement.value;
+            }
+        }
+        // --- SLUTT PÅ ENDRING ---
+
+        if (userAnswer !== 'Ikke besvart' && userAnswer === expectedAnswer) {
+            mcScore += maxPoints; // Bruker definert maks poeng
+        } else if (userAnswer !== expectedAnswer) {
+            // Logg feil hvis svaret er feil eller "Ikke besvart"
+            const questionText = getQuestionText(qId);
+            incorrect.push({
+                name: qId,
+                text: questionText,
+                userAnswer: userAnswer, // Inkluderer brukerens faktiske svar/valgt verdi
+                correctAnswer: expectedAnswer
+            });
+        }
+    }
+    return { score: mcScore, max: max, incorrect: incorrect };
+}
+
+    /**
+     * Henter ut rekkefølgen til elementene, sammenligner den og returnerer score og feil.
+     * @returns {{score: number, max: number, incorrect: Array}} Resultatobjekt.
+     */
+// Bare koden som endres: getResultForOrderQuestions
+
+function getResultForOrderQuestions() {
+    let orderScore = 0;
+    let max = 0;
+    const incorrect = [];
+
+    orderQuestionData.forEach(qData => {
+        const maxPoints = questionPoints[qData.id] || 1; 
+        max += maxPoints; 
+        
+        // Prøver å finne listContainer i hele dokumentet, som er mer robust
+        const listContainer = document.getElementById(qData.id)?.querySelector('.draggable-list') || document.querySelector(`#${qData.id} .draggable-list`);
+        
+        if (!listContainer) {
+            // Logger en feil hvis listen ikke blir funnet
+            const questionText = getQuestionText(qData.id);
+             incorrect.push({
+                name: qData.id,
+                text: questionText,
+                userAnswer: 'Feil: Fant ikke .draggable-list i HTML',
+                correctAnswer: qData.correct.join(' &rarr; ')
+            });
+            return;
+        }
+
+        // Henter både data-ID (for retting) og teksten (for logging)
+        const items = Array.from(listContainer.querySelectorAll('.draggable-item'));
+        const userOrderIds = items.map(item => item.getAttribute('data-id'));
+        const userOrderText = items.map(item => item.innerText.trim()); // Henter teksten
+        
+        const correctSequence = qData.correct;
+        
+        const isCorrect = userOrderIds.length === correctSequence.length &&
+            userOrderIds.every((item, index) => item === correctSequence[index]);
+
+        if (isCorrect) {
+            orderScore += maxPoints;
+        } else {
+            const questionText = getQuestionText(qData.id);
+            incorrect.push({
+                name: qData.id,
+                text: questionText,
+                // NYTT: Bruker teksten i elementet for bedre lesbarhet i feilloggen
+                userAnswer: userOrderText.length > 0 ? userOrderText.join(' &rarr; ') : 'Ikke besvart',
+                correctAnswer: correctSequence.join(' &rarr; ')
+            });
+        }
+    });
+    return { score: orderScore, max: max, incorrect: incorrect };
+}
+
+
+    // --- HOVEDFUNKSJON FOR POENGBEREGNING OG VISNING ---
+
+    /**
+     * Hovedfunksjon for å beregne total score og vise resultatsiden.
+     */
+    function calculateTotalScore() {
+        let totalScore = 0;
+        let maxScore = 0;
+        const incorrect = [];
+
+// Bare koden som endres: calculateTotalScore
+
+// 1. Beregn poeng for Åpne spørsmål (Nøkkelord)
+openQuestionIds.forEach(qId => {
+    const elementId = `${qId}-answer`;
+    // Prøver å finne elementet via ID eller NAME
+    const answerElement = document.getElementById(elementId) || document.querySelector(`[name="${qId}"]`); 
+    
+    // Antar at hvis elementet finnes, er det et input/textarea
+    if (answerElement && 'value' in answerElement) { 
+        const userAnswerText = answerElement.value;
+        const points = getPointsForOpenQuestion(qId, userAnswerText);
+        const questionData = keywordAnswers[qId]; // Henter data for riktig maks poeng
+
+        if (points === 0) {
+            const questionText = getQuestionText(qId, elementId);
+            incorrect.push({
+                name: qId,
+                text: questionText,
+                userAnswer: userAnswerText || 'Ikke besvart',
+                correctAnswer: `Nøkkelord: ${questionData.keywords.join(', ')}`
+            });
+        }
+
+        totalScore += points;
+        maxScore += questionData.points; // Bruker poenget definert i keywordAnswers
+    } else {
+        // Håndterer tilfellet der HTML-elementet ikke blir funnet
+        maxScore += keywordAnswers[qId] ? keywordAnswers[qId].points : 1; // Må legge til maks poeng selv om felt mangler
+        const questionText = getQuestionText(qId);
+         incorrect.push({
+            name: qId,
+            text: questionText,
+            userAnswer: 'HTML-element mangler eller er ikke en input/textarea',
+            correctAnswer: `Nøkkelord: ${keywordAnswers[qId].keywords.join(', ')}`
+        });
+    }
+});
+        
+        // 2. Beregn poeng for Flervalg/Match-spørsmål
+        const mcResult = getResultForMultipleChoice();
+        totalScore += mcResult.score;
+        maxScore += mcResult.max;
+        incorrect.push(...mcResult.incorrect);
+
+        // 3. Beregn poeng for Sorteringsspørsmål
+        const orderResult = getResultForOrderQuestions();
+        totalScore += orderResult.score;
+        maxScore += orderResult.max;
+        incorrect.push(...orderResult.incorrect);
+
+        // Vis resultat-siden
+        displayResult(totalScore, maxScore, incorrect);
+        console.log(`Endelig score: ${totalScore}/${maxScore}`);
+    }
+
+
+    // --- VISNING AV RESULTAT ---
+
+    /**
+     * Viser resultatsiden, med all informasjon samlet i én "resultat-rute".
+     */
+    function displayResult(score, maxScore, incorrect) {
+        const quizContainer = document.getElementById('quizContent');
+        
+        // Sjekker om resultContainer finnes eller oppretter den
+        let resultContainer = document.getElementById('resultContainer');
+        if (!resultContainer) {
+            resultContainer = document.createElement('div');
+            resultContainer.id = 'resultContainer';
+            document.body.appendChild(resultContainer);
+        }
+        
+        // Skjul quizen og vis resultat-containeren
+        if (quizContainer) quizContainer.style.display = 'none';
+        resultContainer.style.display = 'block';
+
+// --- NYTT: SORTERING AV FEILAKTIGE SVAR ---
+    // Funksjon for å sortere ID-er som q1_1, q1_2a, q2_1, osv.
+    const sortIncorrect = (a, b) => {
+        // Hjelpefunksjon for å parse ID til delnummer og spørsmålsnummer/bokstav
+        const parseQid = (qid) => {
+            const match = qid.match(/q(\d+)_(\d+)([a-z])?/);
+            if (!match) return { part: 99, num: 99, sub: 'a' }; // Fallback for ukjente IDer
+            return {
+                part: parseInt(match[1]), // Delnummer (f.eks. 1)
+                num: parseInt(match[2]), // Spørsmålsnummer i del (f.eks. 2)
+                sub: match[3] || 'a'     // Underspørsmål (f.eks. 'a')
+            };
+        };
+
+        const aData = parseQid(a.name);
+        const bData = parseQid(b.name);
+
+        // 1. Sorter etter Delnummer (q1 før q2)
+        if (aData.part !== bData.part) {
+            return aData.part - bData.part;
+        }
+
+        // 2. Sorter etter Spørsmålsnummer i Delen (q1_1 før q1_2)
+        if (aData.num !== bData.num) {
+            return aData.num - bData.num;
+        }
+
+        // 3. Sorter etter Underspørsmål (q1_2a før q1_2b)
+        // Sammenligner strenger ('a' < 'b')
+        return aData.sub.localeCompare(bData.sub);
+    };
+
+    // Utfør sorteringen
+    incorrect.sort(sortIncorrect);
+    // --- SLUTT PÅ SORTERING ---
+
+
+        let html = `
+            <div class="result-card"> <h2 class="result-title">🎉 Prøven er fullført! 🎉</h2>
+                
+                <div class="score-summary">
+                    <p>Du fikk <strong>${score}</strong> poeng av totalt <strong>${maxScore}</strong> mulige.</p>
+                </div>
+        `;
+
+        // Legg til feilaktige svar hvis det finnes noen
+        if (incorrect.length > 0) {
+            html += `
+                <div class="incorrect-answers-section">
+                    <h3 class="incorrect-title">❌ Feilaktige svar (${incorrect.length} totalt)</h3>
+                    <p class="guide-text">Gå gjennom svarene nedenfor for å se hva som var feil og hva som er riktig svar.</p>
+                    <ol class="incorrect-list">
+            `;
+            
+            incorrect.forEach(item => {
+                // Unngår at HTML-kode inni spørsmålsteksten ødelegger layouten
+                const sanitizedText = item.text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                
+                html += `
+                    <li class="incorrect-item">
+                        <h4>${sanitizedText} (${item.name})</h4>
+                        <p class="user-answer"><strong>Ditt svar:</strong> ${item.userAnswer}</p>
+                        <p class="correct-answer"><strong>Riktig svar:</strong> ${item.correctAnswer}</p>
+                    </li>
+                `;
+            });
+
+            html += `
+                    </ol>
+                </div>
+            `;
+        } else {
+            html += `
+                <div class="correct-box">
+                    <h3 class="correct-title">🥳 Gratulerer! Du fikk full pott! 🥳</h3>
+                </div>
+            `;
+        }
+
+        html += `</div>`; // Avslutter hovedruten
+
+        resultContainer.innerHTML = html;
+        
+        // Skroll til toppen av resultatsiden
+        resultContainer.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // --- NAVIGASJON FUNKSJONER (Uendret) ---
+
+    function nextQuestion() {
+        const currentPartElement = document.getElementById(partIds[currentPart - 1]);
+        if (!currentPartElement) return;
+
+        const questionsContainer = currentPartElement.querySelector('.questions-container');
+        const totalQuestions = questionsContainer.querySelectorAll('.question').length;
+
+        if (currentQuestionIndex < totalQuestions - 1) {
+            currentQuestionIndex++;
+        } else if (currentPart < totalParts) {
+            showPart(currentPart + 1, true);
+            return;
+        } else {
+            // Siste spørsmål i siste del -> Fullfør/Kalkuler poeng
+            calculateTotalScore();
+            return; 
+        }
+        updateQuestionVisibility();
+    }
+    
+    function prevQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+        } else if (currentPart > 1) {
+            const prevPartIndex = currentPart - 1;
+            const prevPartId = partIds[prevPartIndex - 1];
+            const prevPartElement = document.getElementById(prevPartId);
+            
+            if (prevPartElement) {
+                const totalPrevQuestions = prevPartElement.querySelector('.questions-container').querySelectorAll('.question').length;
+                showPart(prevPartIndex, false); 
+                currentQuestionIndex = totalPrevQuestions - 1; 
+            }
+        } else {
+            return;
+        }
+        updateQuestionVisibility();
+    }
+
+    function showPart(index, resetQuestion = true) {
+        if (index < 1 || index > totalParts) return;
+
+        partIds.forEach(id => {
+            const part = document.getElementById(id);
+            if (part) part.style.display = 'none';
+        });
+
+        const partToShow = document.getElementById(partIds[index - 1]);
+        if (partToShow) {
+            currentPart = index;
+
+            if (resetQuestion) {
+                currentQuestionIndex = 0;
+            }
+            
+            partToShow.style.display = 'flex';
+            updateQuestionVisibility(); 
+            document.querySelector('.container')?.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    function updateQuestionVisibility() {
+        const currentPartElement = document.getElementById(partIds[currentPart - 1]);
+        if (!currentPartElement) return;
+
+        const questionsContainer = currentPartElement.querySelector('.questions-container');
+        const questionContainers = questionsContainer.querySelectorAll('.question');
+        const totalQuestions = questionContainers.length;
+
+        questionContainers.forEach((q, index) => {
+            q.classList.remove('active');
+            if (index === currentQuestionIndex) {
+                q.classList.add('active');
+            }
+        });
+        
+        const questionNavButtons = currentPartElement.querySelector('.question-navigation-buttons');
+        
+        if (questionNavButtons) {
+            const prevQBtn = questionNavButtons.querySelector('.prev-question-btn');
+            const nextQBtn = questionNavButtons.querySelector('.next-question-btn');
+            const nextPBtn = questionNavButtons.querySelector('.next-part-btn');
+            const submitBtn = questionNavButtons.querySelector('.submit-btn');
+            
+            if (currentQuestionIndex === 0 && currentPart === 1) {
+                prevQBtn.style.visibility = 'hidden';
+            } else {
+                prevQBtn.style.visibility = 'visible';
+            }
+            
+            if (currentQuestionIndex === totalQuestions - 1) {
+                nextQBtn.style.display = 'none'; 
+                
+                if (currentPart < totalParts) {
+                    nextPBtn.style.display = 'block';
+                    submitBtn.style.display = 'none';
+                } else {
+                    nextPBtn.style.display = 'none';
+                    submitBtn.style.display = 'block';
+                }
+            } else {
+                nextQBtn.style.display = 'block';
+                nextPBtn.style.display = 'none';
+                submitBtn.style.display = 'none';
+            }
+            
+            // Koble hendelser
+            prevQBtn.onclick = prevQuestion;
+            nextQBtn.onclick = nextQuestion;
+            nextPBtn.onclick = nextQuestion;
+            submitBtn.onclick = calculateTotalScore;
+        }
+        
+        if (questionsContainer) {
+            questionsContainer.scrollTop = 0;
+        }
+    }
+
+
+    // --- DRA-OG-SLIPP FUNKSJONALITET (Uendret) ---
+    
+    let draggedItem = null; 
+
+    function handleDragStart(e) {
+        draggedItem = this;
+        e.dataTransfer.setData('text/plain', this.dataset.id); 
+        setTimeout(() => this.classList.add('dragging'), 0);
+    }
+
+    function handleDragEnd() {
+        this.classList.remove('dragging');
+        draggedItem = null;
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+
+        const listContainer = this.parentElement; 
+
+        if (this !== draggedItem && this.parentElement === draggedItem.parentElement) {
+            const rect = this.getBoundingClientRect();
+            const next = (e.clientY - rect.top) / rect.height > 0.5;
+            
+            listContainer.insertBefore(draggedItem, next ? this.nextSibling : this);
+        }
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+    }
+    
+    /**
+     * Setter opp dra-og-slipp-funksjonalitet for en spesifikk liste.
+     */
+    function setupDragAndDrop(listContainer) {
+        const listItems = listContainer.querySelectorAll('.draggable-item');
+
+        listItems.forEach(item => {
+            item.setAttribute('draggable', 'true'); 
+
+            item.addEventListener('dragstart', handleDragStart);
+            item.addEventListener('dragend', handleDragEnd);
+            item.addEventListener('dragover', handleDragOver);
+            item.addEventListener('drop', handleDrop);
+        });
+    }
+
+    // Kjøres når DOM-en er fullastet
+    document.addEventListener('DOMContentLoaded', () => {
+        const allDraggableLists = document.querySelectorAll('.draggable-list');
+
+        allDraggableLists.forEach(list => {
+            setupDragAndDrop(list);
+        });
+        
+        // Sørg for at quizen starter
+        showPart(1);
+    });
+    
+</script>
+
+
+
+</body>
+</html>
